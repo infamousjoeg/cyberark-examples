@@ -1,6 +1,6 @@
 # Base Variables
-$apiBaseURL     = "https://cyberark.joegarcia.dev/PasswordVault"
-$aamCCPBaseURL  = "https://cyberark.joegarcia.dev/AIMWebService/api/Accounts"
+$apiBaseURL     = "https://pvwa.example.com"
+$aamCCPBaseURL  = "https://ccp.example.com"
 $apiURI         = "${apiBaseURL}/api"
 
 # Endpoint Variables
@@ -16,13 +16,11 @@ $splatLogon = @{
     Uri         = $apiLogon
     Method      = "Post"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
 $splatAAMCCP = @{
-    Uri         = "${aamCCPBaseURL}?AppID=AD%20Automation&Safe=D-App-CyberArk-API&UserName=Svc_CybrAutomation"
+    Uri         = "${aamCCPBaseURL}?AppID=DemoApp&Safe=DemoSafe&UserName=DemoUser"
     Method      = "Get"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
 
 # Accounts Variables
@@ -31,7 +29,6 @@ $splatAccounts = @{
     Uri         = $apiAccounts
     Method      = "Get"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
 
 # Safes Variables
@@ -40,14 +37,12 @@ $splatSafes = @{
     Uri         = $apiSafes
     Method      = "Get"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
-$safesSafeMember = "jgarcia"
+$safesSafeMember = "CyberArk_Vault_Users"
 $splatSafeMembers = @{
     Uri         = $apiSafes + "/" + $safesSafeName + "/Members"
     Method      = "Get"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
 
 # Application Variables
@@ -56,7 +51,6 @@ $splatApplications = @{
     Uri         = $apiApplications
     Method      = "Get"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
 
 # Application Authentication Variables
@@ -64,7 +58,6 @@ $splatApplicationAuthentication = @{
     Uri         = $apiApplications + "/" + $applicationsAppID + "/Authentications"
     Method      = "Post"
     ContentType = "application/json"
-    ErrorAction = "Stop"
 }
 
 # Logoff Variables
@@ -76,7 +69,7 @@ $splatLogoff = @{
 }
 
 # Logon
-$sessionToken = Invoke-RestMethod @splatLogon -Body $(@{ Username="Svc_CybrAutomation"; Password=$(Invoke-RestMethod @splatAAMCCP).Content } | ConvertTo-Json)
+$sessionToken = Invoke-RestMethod @splatLogon -Body $(@{ Username="DemoUser"; Password=$(Invoke-RestMethod @splatAAMCCP).Content } | ConvertTo-Json)
 $sessionToken | Format-Table
 
 # Set new header parameters with session token
@@ -142,7 +135,7 @@ $splatSafeMembers['Method'] = "Post"
 $bodySafeMembers = @{
     member = @{
         MemberName  = $safesSafeMember
-        SearchIn    = "joegarcia.dev"
+        SearchIn    = "example.com"
         Permissions = @(
             @{Key="UseAccounts";Value=$true}
             @{Key="RetrieveAccounts";Value=$false}
